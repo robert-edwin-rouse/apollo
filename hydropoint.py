@@ -78,7 +78,7 @@ class hydrobase():
             weather = weather_shift(weather, f, days)
         combined = pd.merge(weather, surface, on='Date')
         combined = pd.merge(self.flow, combined, how='inner', on='Date')
-        return weather
+        return combined
     
     def output_file(self, domain_weather, surface_data, days):
         outdf = self.flow_meteorolgy_combine(domain_weather, surface_data, days)
