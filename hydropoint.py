@@ -57,15 +57,15 @@ class hydrobase():
                                                         self.gridsquare[2],
                                                         self.gridsquare[3],)
         
-    def meteorological_extraction(self, domain_data, m='cubic'):
+    def meteorological_extraction(self, domain_data, method):
         local_data = domain_data.interp(longitude=self.lon,
-                                              latitude=self.lat, method=m)
+                                        latitude=self.lat, method=method)
         local_data = local_data.to_dataframe().reset_index()
         return local_data
     
     def flow_meteorolgy_combine(self, domain_weather, surface_data, days):
-        weather = self.meteorological_extraction(domain_weather)
-        surface = self.meteorological_extraction(surface_data)
+        weather = self.meteorological_extraction(domain_weather, 'cubic')
+        surface = self.meteorological_extraction(surface_data, 'cubic')
         weather = rename(weather)
         surface = rename(surface)
         weather = pd.to_datetime(weather['Date'], format='%Y-%m-%d').dt.date
