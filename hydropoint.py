@@ -19,7 +19,7 @@ from apollo import centroid as cr
 
 
 def rename(df):
-    df = df.rename(columns={'tp':'Rain','t':'Temperature',
+    df = df.rename(columns={'time':'Date','tp':'Rain','t':'Temperature',
                         'u':'U Windspeed','v':'V Windspeed','r':'Humidity',
                         'swvl1':'Soil Moisture 1','swvl2':'Soil Moisture 2',
                         'swvl3':'Soil Moisture 3','swvl4':'Soil Moisture 4'})
@@ -67,8 +67,10 @@ class hydrobase():
         surface = self.meteorological_extraction(surface_data)
         weather = rename(weather)
         surface = rename(surface)
-        weather = pd.to_datetime(weather['Date'], format='%Y-%m-%d').dt.date
-        surface = pd.to_datetime(surface['Date'], format='%Y-%m-%d').dt.date
+        weather['Date'] = pd.to_datetime(weather['Date'],
+                                         format='%Y-%m-%d').dt.date
+        surface['Date'] = pd.to_datetime(surface['Date'],
+                                         format='%Y-%m-%d').dt.date
         weather['Resultant Windspeed'] = (weather['U Windspeed']**2 +
                                           weather['V Windspeed']**2)**(1/2)
         for f in ['Rain','Temperature','Resultant Windspeed','Humidity']:
