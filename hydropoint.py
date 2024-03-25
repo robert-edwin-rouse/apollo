@@ -78,8 +78,8 @@ class hydrobase():
                                           weather['V Windspeed']**2)**(1/2)
         for f in ['Rain','Temperature','Resultant Windspeed','Humidity']:
             weather = weather_shift(weather, f, days)
-            for days in [28, 90, 180]:
-                me.stat_roller(weather, f, days, method='mean')
+            for window in [28, 90, 180]:
+                me.stat_roller(weather, f, window, method='mean')
         combined = pd.merge(weather, surface, on='Date')
         combined = pd.merge(self.flow, combined, how='inner', on='Date')
         return combined
