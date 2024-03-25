@@ -138,3 +138,32 @@ def string_to_list(l, numeric=True):
         return [float(x) for x in l]
     else:
         return l
+
+
+def stat_roller(xf, feature, length, method='mean'):
+    '''
+    Creates rolling statistical parameters for pandas dataframes with
+    consistent column name formatting.
+
+    Parameters
+    ----------
+    xf : Pandas dataframe
+        Dataframe from which the rolling statistical parameters are calculated.
+    feature : String
+        Name of the feature column to apply the function to.
+    length : Integer
+        Number of time steps over which to apply the function.
+    method : String, optional
+        Required statistical parameter. The default is 'mean'.  The function
+        also supports variance, through 'var'.
+
+    Returns
+    -------
+    None.
+    '''
+    if method=='mean':
+        column_name = str(feature) + '_' + str(length) + '_Mu'
+        xf[column_name] = xf[feature].rolling(length).mean()
+    elif method=='var':
+        column_name = str(feature) + '_' + str(length) + '_Var'
+        xf[column_name] = xf[feature].rolling(length).var()
