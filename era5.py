@@ -141,7 +141,7 @@ def aggregate_mean(in_file, out_file):
 
     '''
     original = xr.open_dataset(in_file)
-    cache = original.resample(time='24H').mean('time')*1000
+    cache = original.resample(time='24H').mean('time')
     cache.to_netcdf(out_file)
 
 def aggregate_max(in_file, out_file):
@@ -163,5 +163,5 @@ def aggregate_max(in_file, out_file):
 
     '''
     original = xr.open_dataset(in_file)
-    cache = original.resample(time='24H').max('time')*1000
+    cache = original.resample(time='24H').max('time')
     cache.to_netcdf(out_file)

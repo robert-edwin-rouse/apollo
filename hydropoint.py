@@ -67,6 +67,7 @@ class hydrobase():
         surface = self.meteorological_extraction(surface_data)
         weather = rename(weather)
         surface = rename(surface)
+        weather['Rain'] = weather['Rain']*1000
         weather['Date'] = pd.to_datetime(weather['Date'],
                                          format='%Y-%m-%d').dt.date
         surface['Date'] = pd.to_datetime(surface['Date'],
@@ -75,11 +76,11 @@ class hydrobase():
                                           weather['V Windspeed']**2)**(1/2)
         for f in ['Rain','Temperature','Resultant Windspeed','Humidity']:
             weather = weather_shift(weather, f, days)
-        combined = pd.merge(self.flow, weather, how='inner', on='Date')
-        # combined = pd.merge(combined, surface, how='inner', on='Date')
+        combined = pd.merge(self.flow, weather, on='Date')
+        combined = pd.merge(combined, surface, on='Date')
         return weather
     
-    def output_file(self, era_data, days):
-        outdf = self.flow_meteorolgy_combine(era_data, days)
+    def output_file(self, domain_weather, surface_data, days):
+        outdf = self.flow_meteorolgy_combine(domain_weather, surface_data, days)
         outpath = self.station + '_lumped.csv'
         outdf.to_csv(outpath, index=True)
