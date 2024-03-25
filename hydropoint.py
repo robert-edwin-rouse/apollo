@@ -58,8 +58,8 @@ class hydrobase():
                                                         self.gridsquare[3],)
         
     def meteorological_extraction(self, domain_data, method):
-        local_data = domain_data.interp(longitude=self.lon,
-                                        latitude=self.lat, method=method)
+        local_data = domain_data.interp(longitude=self.lon, latitude=self.lat,
+                                        method=method, order=method)
         local_data = local_data.to_dataframe().reset_index()
         return local_data
     
