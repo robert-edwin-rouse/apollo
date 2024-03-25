@@ -162,7 +162,7 @@ class hydrobase():
                 me.stat_roller(weather, f, window, method='mean')
         combined = pd.merge(weather, surface, on='Date')
         combined = pd.merge(self.flow, combined, how='inner', on='Date')
-        combined = combined.drop(combined.index[0:178])
+        combined = combined.drop(combined.index[0:179])
         return combined
     
     def output_file(self, domain_weather, surface_data, days):
