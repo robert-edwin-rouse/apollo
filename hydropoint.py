@@ -26,7 +26,7 @@ def rename(df):
     return df
 
 
-def weathershift(xf, variable, ndays, past=True):
+def weather_shift(xf, variable, ndays, past=True):
     if past == True:
         for i in range (1, ndays):
             colname = str(variable) + '-{0}'.format(i)
@@ -57,20 +57,24 @@ class hydrobase():
                                                         self.gridsquare[2],
                                                         self.gridsquare[3],)
         
-    def meteorological_extraction(self, global_weather, m='cubic'):
-        local_weather = global_weather.interp(longitude=self.lon,
+    def meteorological_extraction(self, domain_data, m='cubic'):
+        local_data = domain_data.interp(longitude=self.lon,
                                               latitude=self.lat, method=m)
-        local_weather = local_weather.to_dataframe().reset_index()
-        return local_weather
+        local_data = local_data.to_dataframe().reset_index()
+        return local_data
     
-    def flow_meteorolgy_combine(self, era_data, days):
-        weather = self.meteorological_extraction(era_data)
+    def flow_meteorolgy_combine(self, domain_weather, surface_data, days):
+        weather = self.meteorological_extraction(domain_weather)
+        surface = self.meteorological_extraction(surface_data)
         weather = rename(weather)
+        surface = rename(surface)
+        weather = pd.to_datetime(weather['Date'], format='%Y-%m-%d').dt.date
+        surface = pd.to_datetime(surface['Date'], format='%Y-%m-%d').dt.date
         weather['Resultant Windspeed'] = (weather['U Windspeed']**2 +
                                           weather['V Windspeed']**2)**(1/2)
         for f in ['Rain','Temperature','Resultant Windspeed','Humidity']:
-            weather = weathershift(weather, f, days)
-        weather = pd.to_datetime(weather['Date'], format='%Y-%m-%d').dt.date
+            weather = weather_shift(weather, f, days)
+        combined = pd.concat([self.flow, weather, surface], axis=1)
         combined = pd.merge(self.flow, weather, how='inner', on='Date')
         return combined
     
@@ -78,13 +82,3 @@ class hydrobase():
         outdf = self.flow_meteorolgy_combine(era_data, days)
         outpath = self.station + '_lumped.csv'
         outdf.to_csv(outpath, index=True)
-
-pd.merge
-
-rain = xr.open_dataset('Daily Precipitation Full.nc')
-pressure = xr.open_dataset('test.nc')
-# surface = xr.open_dataset('soiltest.nc')
-global_weather = xr.merge([rain, pressure], join='inner')
-db = pd.read_csv('CDTest.csv')
-test = hydrobase(db.loc[0][0], db.loc[0][3], db.loc[0][4], db.loc[0][5])
-cache = test.meteorological_extraction(global_weather)
