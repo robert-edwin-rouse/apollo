@@ -77,7 +77,7 @@ class hydrobase():
         for f in ['Rain','Temperature','Resultant Windspeed','Humidity']:
             weather = weather_shift(weather, f, days)
         combined = pd.merge(weather, surface, on='Date')
-        combined = pd.merge(self.flow, combined, on='Date')
+        combined = pd.merge(self.flow, combined, how='inner', on='Date')
         return weather
     
     def output_file(self, domain_weather, surface_data, days):
