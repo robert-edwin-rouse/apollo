@@ -14,8 +14,8 @@ import pandas as pd
 import numpy as np
 import xarray as xr
 import datetime as dt
-import mechanics as me
-import centroid as cr
+from apollo import mechanics as me
+from apollo import centroid as cr
 
 
 def rename(df):
