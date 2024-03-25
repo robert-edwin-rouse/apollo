@@ -183,5 +183,5 @@ class hydrobase():
         None.
         '''
         outdf = self.flow_meteorolgy_combine(domain_weather, surface_data, days)
-        outpath = self.station + '_lumped.csv'
+        outpath = str(self.station) + '_lumped.csv'
         outdf.to_csv(outpath, index=True)
