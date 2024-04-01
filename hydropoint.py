@@ -14,17 +14,19 @@ import pandas as pd
 import numpy as np
 import xarray as xr
 import datetime as dt
-from apollo import mechanics as me
-from apollo import centroid as cr
+import geopandas as gp
+from apollo import mechanics as ma
+from apollo import osgconv as osg
 
 
 def rename(df):
     '''
-    
+    Dictionary based renaming of columns within a dataframe from ECMWF
+    nomenclature to plain language.
 
     Parameters
     ----------
-    df : TYPE
+    df : Pandas dataframe
         DESCRIPTION.
 
     Returns
@@ -71,7 +73,7 @@ def weather_shift(xf, variable, ndays, past=True):
 
 
 class hydrobase():
-    def __init__(self, station, flowpath, gridfile, gridsquare):
+    def __init__(self, station, flowpath, boundaryfile):
         '''
         
 
@@ -99,13 +101,11 @@ class hydrobase():
         self.flow['Date'] = pd.to_datetime(self.flow['Date'],
                                         format='%Y-%m-%d').dt.date
         self.flow['Flow'] = self.flow['Flow'].astype(float)
-        self.gridfile = gridfile
-        self.gridsquare = me.string_to_list(gridsquare)
-        self.centroid = cr.Centroid(gridfile)
-        self.lon, self.lat = self.centroid.lat_lon(self.gridsquare[0],
-                                                        self.gridsquare[1],
-                                                        self.gridsquare[2],
-                                                        self.gridsquare[3],)
+        self.boundaryfile = boundaryfile
+        self.boundary = gp.read_file(self.boundaryfile)
+        self.points = self.boundary.centroid
+        self.lat, self.lon = osg.BNG_2_latlon(self.points.x[0],
+                                              self.points.y[0])
         
     def meteorological_extraction(self, domain_data):
         '''
@@ -159,7 +159,7 @@ class hydrobase():
         for f in ['Rain','Temperature','Resultant Windspeed','Humidity']:
             weather = weather_shift(weather, f, days)
             for window in [28, 90, 180]:
-                me.stat_roller(weather, f, window, method='mean')
+                ma.stat_roller(weather, f, window, method='mean')
         combined = pd.merge(weather, surface, on='Date')
         combined = pd.merge(self.flow, combined, how='inner', on='Date')
         combined = combined.drop(combined.index[0:179])
