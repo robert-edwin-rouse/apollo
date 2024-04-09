@@ -96,30 +96,30 @@ class era5():
         '''
         if self.pressure_set=='n/a':
             filename = str(self.query['file_stem']) + '.nc'
-            self.c.retrieve(self.query['product'], {
-                    "product_type":   "reanalysis",
-                    "format":         "netcdf",
-                    "variable":       self.query['variables'],
-                    "area":           self.query['area'],
-                    "year":           self.query['years'],
-                    "month":          self.query['months'],
-                    "day":            self.query['days'],
-                    "time":           self.query['times']
-                }, filename)
+            self.c.retrieve(self.query['product'],
+                            {"product_type":   "reanalysis",
+                            "format":         "netcdf",
+                            "variable":       self.query['variables'],
+                            "area":           self.query['area'],
+                            "year":           self.query['years'],
+                            "month":          self.query['months'],
+                            "day":            self.query['days'],
+                            "time":           self.query['times']},
+                            filename)
         else:
             for p in self.pressure_set:
                 filename = str(self.query['file_stem']) + str(p) + 'hPa.nc'
-                self.c.retrieve(self.query['product'], {
-                        "product_type":   "reanalysis",
-                        "format":         "netcdf",
-                        "pressure_level": [p],
-                        "variable":       self.query['variables'],
-                        "area":           self.query['area'],
-                        "year":           self.query['years'],
-                        "month":          self.query['months'],
-                        "day":            self.query['days'],
-                        "time":           self.query['times']
-                    }, filename)
+                self.c.retrieve(self.query['product'],
+                                {"product_type":   "reanalysis",
+                                "format":         "netcdf",
+                                "pressure_level": [p],
+                                "variable":       self.query['variables'],
+                                "area":           self.query['area'],
+                                "year":           self.query['years'],
+                                "month":          self.query['months'],
+                                "day":            self.query['days'],
+                                "time":           self.query['times']},
+                                filename)
 
 
 def aggregate_mean(in_file, out_file):

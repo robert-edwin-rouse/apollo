@@ -110,8 +110,8 @@ def best_fit(x,y):
     c : Float
         The intercept for the line of best fit
     '''
-    m = ((np.mean(x)*np.mean(y) - np.mean(x*y)) /
-         (np.mean(x)*np.mean(x) - np.mean(x*x)))
+    m = ((np.mean(x)*np.mean(y) - np.mean(x*y))
+         / (np.mean(x)*np.mean(x) - np.mean(x*x)))
     c = np.mean(y) - m*np.mean(x)
     return m, c
 

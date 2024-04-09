@@ -1,6 +1,10 @@
 """
 Script to convert from the British National Grid coordinate system to the
-WGS84 latitudinal-longitudinal coordinate system.
+WGS84 latitudinal-longitudinal coordinate system, based on the information
+contained within the guidance from the UK Ordnance Survey:
+<https://www.ordnancesurvey.co.uk/documents/resources/
+guide-coordinate-systems-great-britain.pdf>,
+archived here: https://archive.md/7F2kq
 
 @author: robert-edwin-rouse
 """
@@ -10,102 +14,109 @@ import math as m
 
 def parameter_set_1(a, b):
     '''
+    Calculates the first set of parameters, eccentricity and n, 
+    from a set of ellipsoid parameters for a given datum.
     
     Parameters
     ----------
-    a : TYPE
-        DESCRIPTION.
-    b : TYPE
-        DESCRIPTION.
+    a : Float
+        Semi-major axis.
+    b : Float
+        Semi-minor axis.
 
     Returns
     -------
-    e2 : TYPE
-        DESCRIPTION.
-    n : TYPE
-        DESCRIPION.
+    e2 : Float
+        Eccentricity squared.
+    n : Float
+        Ellipsoid parameter n.
     '''
     e2 = (a**2 - b**2)/(a**2)
     n = (a-b)/(a+b)
     return e2, n
 
 
-def parameter_set_2(phi, a0, F0, e2):
+def parameter_set_2(ϕ, a, F, e2):
     '''
-
+    Calculates the second set of parameters, ν, ρ, and η, from the converged
+    latitudinal and ellipsoid parameters for a given datum.
+    
     Parameters
     ----------
-    phi : TYPE
-        DESCRIPTION.
-    a0 : TYPE
-        DESCRIPTION.
-    F0 : TYPE
-        DESCRIPTION.
-    e2 : TYPE
-        DESCRIPTION.
+    ϕ : Float
+        Longitudinal coordinate.
+    a0 : Float
+        Semi-major axis.
+    F0 : Float
+        Scale factor on central meridian.
+    e2 : Float
+        Eccentricity Squared.
 
     Returns
     -------
-    rho : TYPE
-        DESCRIPTION.
-    nu : TYPE
-        DESCRIPTION.
-    eta2 : TYPE
-        DESCRIPTION.
+    ν : Float
+        Conversion parameter, ν.
+    ρ : Float
+        Conversion parameter, ρ.
+    η : Float
+        Conversion parameter, η.
     '''
-    nu = a0 * F0 / (1 - e2 * m.sin(phi)**2)**(0.5)
-    rho = a0 * F0 * (1 - e2)/((1 - e2 * m.sin(phi)**2)**(3/2))
-    eta = nu/rho - 1
-    return nu, rho, eta
+    ν = a * F / (1 - e2 * m.sin(ϕ)**2)**(0.5)
+    ρ = a * F * (1 - e2)/((1 - e2 * m.sin(ϕ)**2)**(3/2))
+    η = ν/ρ - 1
+    return ν, ρ, η
 
 
-def f_M(phi, phi0, n, b, F0):
+def f_M(ϕ, ϕ0, n, b, F):
     '''
-
+    Computation of parameter M, using an iteratively updated value of 
+    the latitudinal parameter, ϕ,
+    
     Parameters
     ----------
-    phi : TYPE
-        DESCRIPTION.
-    phi0 : TYPE
-        DESCRIPTION.
-    a : TYPE
-        DESCRIPTION.
-    b : TYPE
-        DESCRIPTION.
-    F0 : TYPE
-        DESCRIPTION.
+    ϕ : Float
+        Iteratively updated latitude.
+    ϕ0 : Float
+        Initial latitude.
+    a : Float
+        Semi-major axis.
+    b : Float
+        Semi-minor axis.
+    F0 : Float
+        Scale factor on central meridian.
 
     Returns
     -------
-    M : TYPE
-        DESCRIPTION.
+    M : Float
+        Iterative parameter, M.
     '''
-    delta = phi - phi0
-    sigma = phi + phi0
-    M = b * F0 * (
-            (1 + n + 5/4*n**2 + 5/4*n**3) * delta
-            - (3*n + 3*n**2 + 21/8*n**3) * m.sin(delta) * m.cos(sigma)
-            + (15/8 * (n**2 + n**3) * m.sin(2*delta) * m.cos(2*sigma))
-            - (35/24 * n**3 * m.sin(3*delta) * m.cos(3*sigma))
-        )
+    Δϕ = ϕ - ϕ0
+    Σϕ = ϕ + ϕ0
+    M = b * F * ((1 + n + 5/4*n**2 + 5/4*n**3) * Δϕ
+                 - (3*n + 3*n**2 + 21/8*n**3) * m.sin(Δϕ) * m.cos(Σϕ)
+                 + (15/8 * (n**2 + n**3) * m.sin(2*Δϕ) * m.cos(2*Σϕ))
+                 - (35/24 * n**3 * m.sin(3*Δϕ) * m.cos(3*Σϕ)))
     return M
 
 
 def BNG_2_latlon(E, N):
     '''
-    
+    Converts British National Grid Easting and Northing coordinate pair to a
+    latitude/longitude coordinate pair using the WGS84 elipsoid
 
     Parameters
     ----------
-    E : TYPE
-        DESCRIPTION.
-    N : TYPE
-        DESCRIPTION.
+    E : Float
+        Easting coordinate to be converted.
+    N : Float
+        Northing coordinate to be converted.
 
     Returns
     -------
-    TYPE
-        DESCRIPTION.
+    ϕ : Float
+        Latitude coordinate.
+    λ : Float
+        Longitude coordinate.
 
     '''
     a0 = 6377563.396    # Semi-major axis
@@ -121,23 +132,23 @@ def BNG_2_latlon(E, N):
     λ0 = m.radians(λ0)
     
     M, prime = 0, ϕ0
-    while abs(N - N0 - M)>=1e-5:
-        prime = (N - N0 - M)/(a0*F0) + prime
+    while abs(N-N0-M)>=1e-5:
+        prime = (N-N0-M)/(a0*F0) + prime
         M = f_M(prime, ϕ0, n, b0, F0)
     
-    nu, rho, eta = parameter_set_2(prime, a0, F0, e2)
+    ν, ρ, η = parameter_set_2(prime, a0, F0, e2)
     
     tn = m.tan(prime)
     sc = 1/m.cos(prime)
 
-    c1 = tn/(2*rho*nu)
-    c2 = tn/(24*rho*nu**3) * (5 + 3*tn**2 + eta**2 * (1 - 9*tn**2))
-    c3 = tn/(720*rho*nu**5) * (61 + tn**2*(90 + 45 * tn**2))
-    d1 = sc/nu
-    d2 = sc/(6*nu**3) * (nu/rho + 2*tn**2)
-    d3 = sc/(120*nu**5) * (5 + tn**2*(28 + 24*tn**2))
-    d4 = sc/(5040*nu**7) * (61 + tn**2*(662 + tn**2*(1320 + tn**2*720)))
+    c1 = tn/(2*ρ*ν)
+    c2 = tn/(24*ρ*ν**3) * (5 + 3*tn**2 + η**2 * (1 - 9*tn**2))
+    c3 = tn/(720*ρ*ν**5) * (61 + tn**2*(90 + 45 * tn**2))
+    d1 = sc/ν
+    d2 = sc/(6*ν**3) * (ν/ρ + 2*tn**2)
+    d3 = sc/(120*ν**5) * (5 + tn**2*(28 + 24*tn**2))
+    d4 = sc/(5040*ν**7) * (61 + tn**2*(662 + tn**2*(1320 + tn**2*720)))
     ED = E - E0
-    ϕ = prime + ED**2 * (-c1 + ED**2*(c2 - c3*ED**2))
-    λ = λ0 + ED * (d1 + ED**2*(-d2 + ED**2*(d3 - d4*ED**2)))
-    return m.degrees(ϕ), m.degrees(λ)
+    ϕ = m.degrees(prime + ED**2 * (-c1 + ED**2*(c2 - c3*ED**2)))
+    λ = m.degrees(λ0 + ED * (d1 + ED**2*(-d2 + ED**2*(d3 - d4*ED**2))))
+    return ϕ, λ
