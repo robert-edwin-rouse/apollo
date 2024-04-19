@@ -39,7 +39,7 @@ def year_plot(maxflow, df, y_pred, y_obsv, year, colour1='cadetblue',
 
     Returns
     -------
-    Displays the time series plot.
+    None.
 
     '''
     fig, ax = plt.subplots(figsize=(16, 8))
@@ -79,7 +79,7 @@ def scatter_plot(maxflow, df, pred, obsv, colour='steelblue', marker='*'):
 
     Returns
     -------
-    Displays the scatter plot.
+    None.
 
     '''
     xyline = np.linspace(0, maxflow, maxflow)
@@ -92,4 +92,53 @@ def scatter_plot(maxflow, df, pred, obsv, colour='steelblue', marker='*'):
     ax.set_ylim([0, maxflow])
     ax.xaxis.set_major_locator(mtk.MaxNLocator(5))
     ax.yaxis.set_major_locator(mtk.MaxNLocator(5))
+    plt.show()
+
+
+def rainflow_plot(maxflow, maxrain, df, flow, rain, year, colour1='cadetblue',
+               colour2='darkseagreen'):
+    '''
+    Generates a scatter plot of observations against predictions with an
+    indicator line of perfect fit.
+
+    Parameters
+    ----------
+    maxflow : Float
+        Maximum flow for scaling the y axis
+    maxrain : Float
+        Maximum rain for scaling the y axis
+    df : Pandas dataframe
+        Pandas dataframe with observations, predictions, and date columns
+    flow : String
+        Name of the observed flow column
+    rain : String
+        Name of the observed rain column
+    year : Integer
+        Target year to be plotted as a time series
+    colour1 : String, optional
+        Predicted time series colour. The default is 'cadetblue'.
+    colour2 : String, optional
+        Observed time series colour. The default is 'darkseagreen'.
+
+    Returns
+    -------
+    None.
+
+    '''
+    fig, ax1 = plt.subplots(figsize=(16, 8))
+    ax1.set_xlim([dt.date(year, 1, 1), dt.date(year, 12, 31)])
+    ax1.set_xlabel('Date')
+    ax1.xaxis.set_major_locator(mdt.MonthLocator())
+    ax1.xaxis.set_major_formatter(mdt.DateFormatter('%b'))
+    ax1.set_ylim(0,maxflow)
+    ax1.set_ylabel('Flow (m'+r'$^3$'+'s'+r'$^{-1}$'+')')
+    ax1.yaxis.set_major_locator(mtk.MaxNLocator(5))
+    ax1.grid(c='black', ls='dotted', lw=0.5)
+    ax1.plot(df['Date'], df[flow], colour2, lw=3.2, label='Flow')
+    ax1.plot(np.nan, colour1, lw=3.2, label='Precipitation', ls='--')
+    ax2 = ax1.twinx()
+    ax2.set_ylabel('Precipitation (mm)')
+    ax2.set_ylim(maxrain,0)
+    ax2.plot(df['Date'], df[rain], colour1, lw=3.2, ls='--')
+    ax1.legend(loc=0, bbox_to_anchor=(0.25,0.8))
     plt.show()
