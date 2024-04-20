@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 
 
 def year_plot(maxflow, df, y_pred, y_obsv, year, colour1='cadetblue',
-              colour2='darkseagreen'):
+              colour2='darkseagreen', uncertainty=False, var=None):
     '''
     Generates a scatter plot of observations against predictions with an
     indicator line of perfect fit.    
@@ -36,6 +36,10 @@ def year_plot(maxflow, df, y_pred, y_obsv, year, colour1='cadetblue',
         Predicted time series colour. The default is 'cadetblue'.
     colour2 : String, optional
         Observed time series colour. The default is 'darkseagreen'.
+    uncertainty : Boolean, optional
+        Indicates whether or not to fill between 0.95 confidence interval 
+    var : String, optional
+        Name of the variance column for including uncertainty
 
     Returns
     -------
@@ -54,8 +58,14 @@ def year_plot(maxflow, df, y_pred, y_obsv, year, colour1='cadetblue',
     ax.yaxis.set_major_locator(mtk.MaxNLocator(5))
     ax.legend(['Prediction', 'Actual'], loc='upper left')
     ax.grid(c='black', ls='dotted', lw=0.5)
-    plt.show()
-
+    if uncertainty == True:
+        ax.fill_between(df['Date'],
+                 df[y_pred] - 1.96 * np.sqrt(df[var]),
+                 df[y_pred] + 1.96 * np.sqrt(df[var]),
+                 color=colour1, alpha=0.4)
+        plt.show()
+    else:  
+        plt.show()
 
 def scatter_plot(maxflow, df, pred, obsv, colour='steelblue', marker='*'):
     '''
@@ -98,8 +108,8 @@ def scatter_plot(maxflow, df, pred, obsv, colour='steelblue', marker='*'):
 def rainflow_plot(maxflow, maxrain, df, flow, rain, year, colour1='cadetblue',
                colour2='darkseagreen'):
     '''
-    Generates a scatter plot of observations against predictions with an
-    indicator line of perfect fit.
+    Generates a line plot of observed streamflow on the left y-axis and the
+    preceeding day's worth of rainfall on the right y-axis.
 
     Parameters
     ----------
