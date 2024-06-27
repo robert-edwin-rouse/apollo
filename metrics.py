@@ -29,6 +29,50 @@ def RMSE(y_o, y_p):
     return rmse
 
 
+def MPRE(y_o, y_p):
+    '''
+    Function to evalate the mean percent relative error
+    between a set of observations and predictions
+    
+    Parameters
+    ----------
+    y_o : Float, Numpy Array, or Pandas DataFrame Column
+        Set of observations, y
+    y_p : Float, Numpy Array, or Pandas DataFrame Column
+        Set of predictions, y'
+        
+    Returns
+    -------
+    rmse : Float
+        Relative Bias
+    '''
+    total = abs((y_o - y_p)/y_o)
+    mpre = 100*sum(total)/len(y_o)
+    return mpre
+
+
+def RB(y_o, y_p):
+    '''
+    Function to evalate the relative bias
+    between a set of observations and predictions
+    
+    Parameters
+    ----------
+    y_o : Float, Numpy Array, or Pandas DataFrame Column
+        Set of observations, y
+    y_p : Float, Numpy Array, or Pandas DataFrame Column
+        Set of predictions, y'
+        
+    Returns
+    -------
+    rmse : Float
+        Relative Bias
+    '''
+    total = (y_o - y_p)/y_o
+    rb = sum(total)/len(y_o)
+    return rb
+
+
 def R2(y_o, y_p):
     '''
     Function to evalate the r2 value between
