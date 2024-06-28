@@ -97,6 +97,35 @@ def R2(y_o, y_p):
     return r2
 
 
+def KGE(y_o, y_p):
+    '''
+    Function to evalate the Kling-Gupta Efficiency for
+    a set of observations and predictions
+    
+    Parameters
+    ----------
+    y_o : Float, Numpy Array, or Pandas DataFrame Column
+        Set of observations, y
+    y_p : Float, Numpy Array, or Pandas DataFrame Column
+        Set of predictions, y'
+        
+    Returns
+    -------
+    kge : Float
+        Kling-Gupta Efficiency
+    '''
+    n = len(y_o)
+    r = (n*sum(y_o*y_p) - sum(y_o)*sum(y_p)) / (
+        (n*sum(y_o*y_o) - sum(y_o)*sum(y_o)) *
+        (n*sum(y_p*y_p) - sum(y_p)*sum(y_p)))**(0.5)
+    mu_o = np.mean(y_o)
+    mu_p = np.mean(y_p)
+    sigma_o = np.std(y_o)
+    sigma_p = np.std(y_p)
+    kge = 1 - ((r-1)**2 + (sigma_p/sigma_o-1)**2 + (mu_p/mu_o-1)**2)**(0.5)
+    return kge
+
+
 def RE(y_o, y_p, psi):
     '''
     Function to evalate the reflective error
