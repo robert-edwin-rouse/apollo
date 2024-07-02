@@ -114,15 +114,15 @@ def KGE(y_o, y_p):
     kge : Float
         Kling-Gupta Efficiency
     '''
-    n = len(y_o)
-    r = (n*sum(y_o*y_p) - sum(y_o)*sum(y_p)) / (
-        (n*sum(y_o*y_o) - sum(y_o)*sum(y_o)) *
-        (n*sum(y_p*y_p) - sum(y_p)*sum(y_p)))**(0.5)
-    mu_o = np.mean(y_o)
-    mu_p = np.mean(y_p)
-    sigma_o = np.std(y_o)
-    sigma_p = np.std(y_p)
-    kge = 1 - ((r-1)**2 + (sigma_p/sigma_o-1)**2 + (mu_p/mu_o-1)**2)**(0.5)
+    
+    r = np.sum((y_o - np.mean(y_o)) * (y_p - np.mean(y_p)))/(
+        np.sum(y_o - np.mean(y_o))**2 * np.sum(y_p - np.mean(y_p))**2)**(0.5)
+    # r = (n*sum(y_o*y_p) - sum(y_o)*sum(y_p)) / (
+    #     (n*sum(y_o*y_o) - sum(y_o)*sum(y_o)) *
+    #     (n*sum(y_p*y_p) - sum(y_p)*sum(y_p)))**(0.5)
+    alpha = np.mean(y_p)/np.mean(y_o)
+    beta = np.std(y_p)/np.std(y_o)
+    kge = 1 - ((r-1)**2 + (alpha-1)**2 + (beta-1)**2)**(0.5)
     return kge
 
 
