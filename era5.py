@@ -122,7 +122,7 @@ class era5():
                                 filename)
 
 
-def aggregate_mean(in_file, out_file):
+def aggregate_mean(in_file, out_file, time='24H'):
     '''
     Aggregates hourly array data, stored in a netcdf format, using xarray
     to a daily mean variable instead and outputs to a target file.
@@ -134,6 +134,8 @@ def aggregate_mean(in_file, out_file):
         Input hourly data file.  Expects netcdf format or similar.
     out_file : String
         Output daily data file.  Expects netcdf format or similar.
+    time : String, optional
+        Time step over which to apply the aggregation. The default is '24H'.
 
     Returns
     -------
@@ -141,10 +143,11 @@ def aggregate_mean(in_file, out_file):
 
     '''
     original = xr.open_dataset(in_file)
-    cache = original.resample(time='24H').mean('time')
+    cache = original.resample(time=time).mean('time')
     cache.to_netcdf(out_file)
 
-def aggregate_max(in_file, out_file):
+
+def aggregate_max(in_file, out_file, time='24H'):
     '''
     Aggregates hourly array data, stored in a netcdf format, using xarray
     to a daily maximum variable instead and outputs to a target file.
@@ -156,6 +159,8 @@ def aggregate_max(in_file, out_file):
         Input hourly data file.  Expects netcdf format or similar.
     out_file : String
         Output daily data file.  Expects netcdf format or similar.
+    time : String, optional
+        Time step over which to apply the aggregation. The default is '24H'.
     
     Returns
     -------
@@ -163,5 +168,5 @@ def aggregate_max(in_file, out_file):
 
     '''
     original = xr.open_dataset(in_file)
-    cache = original.resample(time='24H').max('time')
+    cache = original.resample(time=time).max('time')
     cache.to_netcdf(out_file)

@@ -197,3 +197,28 @@ def RELossFunc(prediction, target, psi):
     '''
     interrim_loss = (((prediction - target)**2) * psi)
     return interrim_loss
+
+
+def confusion_matrix(observations, predictions):
+    '''
+    Computes a confusion matrix using numpy for two np.arrays
+    of observed class labels and predicted class labels
+
+    Parameters
+    ----------
+    observations : Numpy array of integers
+        Observed class labels.
+    predictions : Numpy array of integers
+        Predicted class labels.
+
+    Returns
+    -------
+    matrix : Numpy array
+        n by n confusion matrix for n class labels
+
+    '''
+    n = len(np.unique(observations))
+    matrix = np.zeros((n, n))
+    for i in range(len(observations)):
+      matrix[observations[i]][predictions[i]] += 1
+    return matrix
