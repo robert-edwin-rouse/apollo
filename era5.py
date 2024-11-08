@@ -105,7 +105,7 @@ class era5():
                             "month":          self.query['months'],
                             "day":            self.query['days'],
                             "time":           self.query['times']},
-                            filename)
+                            filename).download()
         else:
             for p in self.pressure_set:
                 filename = str(self.query['file_stem']) + str(p) + 'hPa.nc'
@@ -119,7 +119,7 @@ class era5():
                                 "month":          self.query['months'],
                                 "day":            self.query['days'],
                                 "time":           self.query['times']},
-                                filename)
+                                filename).download()
 
 
 def aggregate_mean(in_file, out_file, time='24H'):
