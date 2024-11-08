@@ -98,7 +98,7 @@ class era5():
             filename = str(self.query['file_stem']) + '.nc'
             self.c.retrieve(self.query['product'],
                             {"product_type":   "reanalysis",
-                            "format":         "netcdf",
+                            "data_format":         "netcdf",
                             "variable":       self.query['variables'],
                             "area":           self.query['area'],
                             "year":           self.query['years'],
@@ -111,7 +111,7 @@ class era5():
                 filename = str(self.query['file_stem']) + str(p) + 'hPa.nc'
                 self.c.retrieve(self.query['product'],
                                 {"product_type":   "reanalysis",
-                                "format":         "netcdf",
+                                "data_format":         "netcdf",
                                 "pressure_level": [p],
                                 "variable":       self.query['variables'],
                                 "area":           self.query['area'],
