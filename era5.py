@@ -97,15 +97,15 @@ class era5():
         if self.pressure_set=='n/a':
             filename = str(self.query['file_stem']) + '.nc'
             self.c.retrieve(self.query['product'],
-                            {"product_type":   "reanalysis",
-                            "data_format":         "netcdf",
+                            {"product_type":   ["reanalysis"],
+                            "data_format":         ["netcdf"],
                             "variable":       self.query['variables'],
                             "area":           self.query['area'],
                             "year":           self.query['years'],
                             "month":          self.query['months'],
                             "day":            self.query['days'],
                             "time":           self.query['times']},
-                            filename).download()
+                            filename)
         else:
             for p in self.pressure_set:
                 filename = str(self.query['file_stem']) + str(p) + 'hPa.nc'
@@ -119,7 +119,7 @@ class era5():
                                 "month":          self.query['months'],
                                 "day":            self.query['days'],
                                 "time":           self.query['times']},
-                                filename).download()
+                                filename)
 
 
 def aggregate_mean(in_file, out_file, time='24H'):
